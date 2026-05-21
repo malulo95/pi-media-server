@@ -1,0 +1,91 @@
+# Docker Compose stack for Raspberry Pi 400 (ARM64)
+# Start all services:
+#   docker compose up -d
+# Stop all services:
+#   docker compose down
+services:
+  slskd:
+    image: slskd/slskd:latest
+    platform: linux/arm64
+    container_name: slskd
+    restart: unless-stopped
+    environment:
+      SLSKD_REMOTE_CONFIGURATION: "true"
+      TZ: America/Argentina/Buenos_Aires
+    ports:
+      # Web UI
+      - "5030:5030"
+      # Soulseek listening port
+      - "50300:50300"
+    volumes:
+      # App config/data
+      - ./data/slskd/app:/app
+      # Downloads folder
+      - ./data/media/torrents/completados/Musica:/downloads
+      # Shared music library
+      - ./data/media/Musica/FLAC:/shared
+    networks:
+      - media_net
+
+  beets:
+    build:
+      context: ./docker/beets
+      dockerfile: Dockerfile
+    platform: linux/arm64
+    container_name: beets
+    restart: unless-stopped
+    volumes:
+      # Beets config + library database (copy config.yaml.example as config.yaml)
+      - ./data/beets/config:/config
+      # Destination music library
+      - ./data/media/Musica/FLAC:/library
+      # Incoming files to import/organize
+      - ./data/media/torrents/completados/Musica:/imports
+    networks:
+      - media_net
+
+  qbittorrent:
+    image: linuxserver/qbittorrent:latest
+    platform: linux/arm64
+    container_name: qbittorrent
+    restart: unless-stopped
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: America/Argentina/Buenos_Aires
+      WEBUI_PORT: "8080"
+    ports:
+      # Web UI
+      - "8080:8080"
+      # Torrent ports (TCP/UDP)
+      - "6881:6881"
+      - "6881:6881/udp"
+    volumes:
+      # qBittorrent config
+      - ./data/qbittorrent/config:/config
+      # Downloads/complete files
+      - ./data/media/torrents:/downloads
+    networks:
+      - media_net
+
+  telegram-bot:
+    build:
+      context: ./docker/telegram-bot
+      dockerfile: Dockerfile
+    platform: linux/arm64
+    container_name: telegram-bot
+    restart: unless-stopped
+    environment:
+      # Required: set in .env or shell before docker compose up -d
+      TELEGRAM_BOT_TOKEN: "${TELEGRAM_BOT_TOKEN:-}"
+      # Optional: restrict responses to one chat ID
+      TELEGRAM_ALLOWED_CHAT_ID: "${TELEGRAM_ALLOWED_CHAT_ID:-}"
+    volumes:
+      - ./data/telegram-bot/config:/app/config
+      - ./data/telegram-bot/logs:/app/logs
+    networks:
+      - media_net
+
+networks:
+  media_net:
+    driver: bridge

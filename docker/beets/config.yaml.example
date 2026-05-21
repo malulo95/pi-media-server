@@ -1,0 +1,39 @@
+directory: /library
+library: /config/library.db
+
+import:
+  move: true
+  write: true
+  quiet: true
+  group_albums: true
+  duplicate_action: skip
+
+paths:
+  default: $albumartist/$album ($year) [$format]/$track - $title
+  singleton: Singletons/$artist - $title
+  comp: Compilations/$album ($year) [$format]/$track - $title
+
+plugins:
+  - fetchart
+  - embedart
+  - lyrics
+  - lastgenre
+  - acoustid
+  - info
+  - missing
+
+fetchart:
+  auto: true
+  sources: filesystem coverart itunes amazon lastfm
+
+embedart:
+  auto: true
+
+lastgenre:
+  auto: true
+
+lyrics:
+  auto: true
+
+acoustid:
+  apikey: "PUT_YOUR_ACOUSTID_KEY_HERE"
