@@ -1,0 +1,43 @@
+directory: /library
+library: /config/library.db
+
+import:
+  move: true
+  write: true
+  quiet: true
+  group_albums: true
+  duplicate_action: skip
+  # Log every import action (imported, skipped, asis, duplicate…) to this file.
+  # The telegram bot reads this file to report failed/unmatched ingest items.
+  log: /config/import.log
+
+paths:
+  default: $albumartist/$album ($year) [$format]/$track - $title
+  singleton: Singletons/$artist - $title
+  comp: Compilations/$album ($year) [$format]/$track - $title
+
+plugins:
+  - fetchart
+  - embedart
+  - lyrics
+  - lastgenre
+  - acoustid
+  - info
+  - missing
+
+fetchart:
+  auto: true
+  sources: filesystem coverart itunes amazon lastfm
+
+embedart:
+  auto: true
+
+lastgenre:
+  auto: true
+
+lyrics:
+  auto: true
+
+acoustid:
+  # Get an API key at: https://acoustid.org/new-application
+  apikey: YOUR_ACOUSTID_API_KEY_HERE
