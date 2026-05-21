@@ -26,6 +26,9 @@ BEETS_FAILURES_LIMIT = int(os.getenv("BEETS_FAILURES_LIMIT", "20"))
 # "skip"         – item was skipped (no match found or ambiguous in quiet mode)
 # "asis"         – imported without metadata (no match accepted)
 # "duplicate_*"  – a duplicate was detected and handled (skipped or replaced)
+# Each prefix includes a trailing space to avoid partial-word matches
+# (e.g. "skipped" would otherwise match "skip"). This matches the exact
+# format that beets writes: "<action> <path>".
 _FAILURE_PREFIXES = ("skip ", "asis ", "duplicate_skip ", "duplicate_replace ", "duplicate_merge ")
 
 
@@ -40,6 +43,8 @@ def _parse_beets_failures(log_path: str, limit: int) -> list[str]:
     if not path.exists():
         return []
     # Keep only the last `limit` matches without buffering the whole log.
+    # For a typical home-server beets log, any() + startswith() is fast
+    # enough; replace with a compiled regex if logs grow into the millions.
     window: deque[str] = deque(maxlen=limit)
     with path.open(encoding="utf-8", errors="replace") as fh:
         for raw in fh:
@@ -52,7 +57,12 @@ def _parse_beets_failures(log_path: str, limit: int) -> list[str]:
 
 
 def _safe_truncate(text: str, max_bytes: int = 4090) -> str:
-    """Truncate *text* to *max_bytes* UTF-8 bytes without breaking characters."""
+    """Truncate *text* to *max_bytes* UTF-8 bytes without breaking characters.
+
+    The default of 4090 leaves a 6-byte margin below Telegram's 4096-character
+    limit to safely accommodate the appended "\\n…" suffix (4 UTF-8 bytes) plus
+    a small safety buffer for any boundary edge cases.
+    """
     encoded = text.encode("utf-8")
     if len(encoded) <= max_bytes:
         return text
