@@ -80,6 +80,9 @@ services:
       TELEGRAM_BOT_TOKEN: "${TELEGRAM_BOT_TOKEN:-}"
       # Optional: restrict responses to one chat ID
       TELEGRAM_ALLOWED_CHAT_ID: "${TELEGRAM_ALLOWED_CHAT_ID:-}"
+      # Optional: customize bot responses without rebuilding image
+      TELEGRAM_START_MESSAGE: "${TELEGRAM_START_MESSAGE:-Bot de Pi Media Server en línea ✅}"
+      TELEGRAM_STATUS_MESSAGE: "${TELEGRAM_STATUS_MESSAGE:-Servicios docker activos. Revisa docker compose ps en la Pi.}"
     volumes:
       - ./data/telegram-bot/config:/app/config
       - ./data/telegram-bot/logs:/app/logs

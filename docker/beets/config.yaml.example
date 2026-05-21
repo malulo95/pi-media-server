@@ -36,4 +36,5 @@ lyrics:
   auto: true
 
 acoustid:
+  # Get an API key at: https://acoustid.org/new-application
   apikey: "PUT_YOUR_ACOUSTID_KEY_HERE"

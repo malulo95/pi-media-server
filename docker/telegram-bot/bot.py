@@ -12,20 +12,25 @@ logging.basicConfig(
 
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 BOT_ALLOWED_CHAT = os.getenv("TELEGRAM_ALLOWED_CHAT_ID", "")
+START_MESSAGE = os.getenv("TELEGRAM_START_MESSAGE", "Bot de Pi Media Server en línea ✅")
+STATUS_MESSAGE = os.getenv(
+    "TELEGRAM_STATUS_MESSAGE",
+    "Servicios docker activos. Revisa docker compose ps en la Pi.",
+)
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if BOT_ALLOWED_CHAT and str(update.effective_chat.id) != BOT_ALLOWED_CHAT:
         logging.warning("Unauthorized /start request from chat_id=%s", update.effective_chat.id)
         return
-    await update.message.reply_text("Bot de Pi Media Server en línea ✅")
+    await update.message.reply_text(START_MESSAGE)
 
 
 async def status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if BOT_ALLOWED_CHAT and str(update.effective_chat.id) != BOT_ALLOWED_CHAT:
         logging.warning("Unauthorized /status request from chat_id=%s", update.effective_chat.id)
         return
-    await update.message.reply_text("Servicios docker activos. Revisa docker compose ps en la Pi.")
+    await update.message.reply_text(STATUS_MESSAGE)
 
 
 async def main() -> None:
