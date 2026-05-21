@@ -23,11 +23,12 @@ def _log_unauthorized(command: str, update: Update) -> None:
     chat = update.effective_chat
     user = update.effective_user
     logging.warning(
-        "Unauthorized %s from chat_id=%s chat_title=%s user=%s",
+        "Unauthorized %s from chat_id=%s chat_title=%s user=%s user_id=%s",
         command,
         getattr(chat, "id", "unknown"),
         getattr(chat, "title", ""),
         getattr(user, "username", ""),
+        getattr(user, "id", "unknown"),
     )
 
 
