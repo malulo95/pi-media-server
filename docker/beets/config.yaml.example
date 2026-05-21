@@ -37,4 +37,4 @@ lyrics:
 
 acoustid:
   # Get an API key at: https://acoustid.org/new-application
-  apikey: "REPLACE_WITH_YOUR_ACOUSTID_API_KEY"
+  apikey: YOUR_ACOUSTID_API_KEY_HERE

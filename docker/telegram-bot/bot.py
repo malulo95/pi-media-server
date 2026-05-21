@@ -50,7 +50,7 @@ async def main() -> None:
     if not BOT_TOKEN:
         raise RuntimeError(
             "TELEGRAM_BOT_TOKEN environment variable is required but not set. "
-            "Set it in your shell or Docker Compose environment before starting the bot."
+            "Set it in a .env file or export it before running docker compose up."
         )
 
     app = Application.builder().token(BOT_TOKEN).build()
