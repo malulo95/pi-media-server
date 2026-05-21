@@ -83,9 +83,15 @@ services:
       # Optional: customize bot responses without rebuilding image
       TELEGRAM_START_MESSAGE: "${TELEGRAM_START_MESSAGE:-Bot de Pi Media Server en línea ✅}"
       TELEGRAM_STATUS_MESSAGE: "${TELEGRAM_STATUS_MESSAGE:-Servicios docker activos. Revisa docker compose ps en la Pi.}"
+      # Path to the beets import log inside the container (read via shared volume)
+      BEETS_LOG_PATH: "${BEETS_LOG_PATH:-/beets-config/import.log}"
+      # Maximum number of failure lines returned by /failures
+      BEETS_FAILURES_LIMIT: "${BEETS_FAILURES_LIMIT:-20}"
     volumes:
       - ./data/telegram-bot/config:/app/config
       - ./data/telegram-bot/logs:/app/logs
+      # Beets config dir mounted read-only so the bot can inspect the import log
+      - ./data/beets/config:/beets-config:ro
     networks:
       - media_net
 

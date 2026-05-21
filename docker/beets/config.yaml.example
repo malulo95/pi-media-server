@@ -7,6 +7,9 @@ import:
   quiet: true
   group_albums: true
   duplicate_action: skip
+  # Log every import action (imported, skipped, asis, duplicate…) to this file.
+  # The telegram bot reads this file to report failed/unmatched ingest items.
+  log: /config/import.log
 
 paths:
   default: $albumartist/$album ($year) [$format]/$track - $title
