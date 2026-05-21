@@ -19,23 +19,38 @@ STATUS_MESSAGE = os.getenv(
 )
 
 
+def _log_unauthorized(command: str, update: Update) -> None:
+    chat = update.effective_chat
+    user = update.effective_user
+    logging.warning(
+        "Unauthorized %s from chat_id=%s chat_title=%s user=%s",
+        command,
+        getattr(chat, "id", "unknown"),
+        getattr(chat, "title", ""),
+        getattr(user, "username", ""),
+    )
+
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if BOT_ALLOWED_CHAT and str(update.effective_chat.id) != BOT_ALLOWED_CHAT:
-        logging.warning("Unauthorized /start request from chat_id=%s", update.effective_chat.id)
+        _log_unauthorized("/start", update)
         return
     await update.message.reply_text(START_MESSAGE)
 
 
 async def status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if BOT_ALLOWED_CHAT and str(update.effective_chat.id) != BOT_ALLOWED_CHAT:
-        logging.warning("Unauthorized /status request from chat_id=%s", update.effective_chat.id)
+        _log_unauthorized("/status", update)
         return
     await update.message.reply_text(STATUS_MESSAGE)
 
 
 async def main() -> None:
     if not BOT_TOKEN:
-        raise RuntimeError("Set TELEGRAM_BOT_TOKEN environment variable")
+        raise RuntimeError(
+            "TELEGRAM_BOT_TOKEN environment variable is required but not set. "
+            "Set it in your shell or docker-compose environment before starting the bot."
+        )
 
     app = Application.builder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
